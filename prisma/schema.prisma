@@ -1,0 +1,53 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  
+}
+
+enum IssueStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      String   @default("NEIGHBOR")
+  issues    Issue[]
+  comments  Comment[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Issue {
+  id          Int         @id @default(autoincrement())
+  title       String
+  description String
+  status      IssueStatus @default(OPEN)
+
+  authorId Int
+  author   User @relation(fields: [authorId], references: [id])
+
+  comments  Comment[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Comment {
+  id       Int    @id @default(autoincrement())
+  body     String
+
+  authorId Int
+  author   User @relation(fields: [authorId], references: [id])
+
+  issueId Int
+  issue   Issue @relation(fields: [issueId], references: [id])
+
+  createdAt DateTime @default(now())
+}
